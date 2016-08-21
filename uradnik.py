@@ -1,6 +1,8 @@
 import PyPDF2, re
 
-pdfFileObj = open('DetailedReportPatientJozeTeropsic.pdf', 'rb')      #cpap
+#pdfFileObj = open('DetailedReportPatientJozeTeropsic.pdf', 'rb')      #cpap
+pdfFileObj = open('DetailedReportPatientMarijaMeglic.pdf', 'rb')
+
 #pdfFileObj = open('DetailedReportPatientZdravkoGlobocnik.pdf', 'rb') #bipap
 #pdfFileObj = open('DetailedReportPatientFrancBricman.pdf', 'rb')     #asv
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj) #pdfFileReader object
@@ -18,6 +20,7 @@ textFromPagePredzadnja = pageObjPredzadnja.extractText()
 textFromPageZadnja = pageObjZadnja.extractText()
 
 #zacetne vrednosti spremenljivk so "ni podatka":
+#-za auto cpap
 priimek = "ni podatka"
 ime = "ni podatka"
 aparat = "ni podatka"
@@ -28,6 +31,14 @@ cumulativeUsage = "ni podatka"
 averageUsageAllDays = "ni podatka"
 averageUsageDaysUsed = "ni podatka"
 percentDaysWithUsageAtLeastFourHours = "ni podatka"
+deviceMode = "ni podatka"
+cpapMeanPressure = "ni podatka"
+largeLeak = "ni podatka"
+ahi = "ni podatka" #AHI
+minCpapPressure = "ni podatka"
+maxCpapPressure = "ni podatka"
+aFlex = "ni podatka"
+datum = "ni podatka"
 
 #Priimek, ime, model aparata
 reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[\w]*),\s(?P<ime>[\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
@@ -77,9 +88,42 @@ if "REMstar" in aparat:
     matchPercentDaysUsageAtLeastFourHours = rePercentDaysUsageAtLeastFourHours.search(textFromPageZadnja)
     if matchPercentDaysUsageAtLeastFourHours:
         percentDaysWithUsageAtLeastFourHours = matchPercentDaysUsageAtLeastFourHours.group('percentDaysWithUsageAtLeastFourHours')
-
-
-
+    #device mode
+    reDeviceMode = re.compile(r'Device Settings as of[\d\/]*(?P<deviceMode>[\w\s\/\-]*)Device SettingsDevice')
+    matchDeviceMode = reDeviceMode.search(textFromPageZadnja)
+    if matchDeviceMode:
+        deviceMode = matchDeviceMode.group('deviceMode')
+    #cpap mean pressure
+    reMeanPressure = re.compile(r'CPAP Mean Pressure(?P<cpapMeanPressure>\d+\.\d+) cmH2O')
+    matchMeanPressure = reMeanPressure.search(textFromPageZadnja)
+    if matchMeanPressure:
+        cpapMeanPressure = matchMeanPressure.group('cpapMeanPressure')
+    #average time in large leak per day:
+    reLargeLeak = re.compile(r'Average Time in Large Leak Per Day(?P<largeLeak>[\d* hrs\.| mins\.| secs.]*)')
+    matchLargeLeak = reLargeLeak.search(textFromPageZadnja)
+    if matchLargeLeak:
+        largeLeak = matchLargeLeak.group('largeLeak')
+    #average AHI
+    reAhi = re.compile(r'Average AHI(?P<ahi>\d+\.\d+)')
+    matchAhi = reAhi.search(textFromPageZadnja)
+    if matchAhi:
+        ahi = matchAhi.group('ahi')
+    #min in max tlak
+    reMinMaxPr = re.compile(r'Min Pressure(?P<minCpapPressure>\d*) cmH2OMax Pressure(?P<maxCpapPressure>\d*) cmH2O')
+    matchMinMaxPr = reMinMaxPr.search(textFromPageZadnja)
+    if matchMinMaxPr:
+        minCpapPressure = matchMinMaxPr.group('minCpapPressure')
+        maxCpapPressure = matchMinMaxPr.group('maxCpapPressure')
+    #a-flex
+    reAflex = re.compile(r'A-Flex Setting(?P<aFlex>\d*)A-Flex Lock')
+    matchAflex = reAflex.search(textFromPageZadnja)
+    if matchAflex:
+        aFlex = matchAflex.group('aFlex')
+    #datum
+    reDatum = re.compile(r'Printed By\:(?P<datum>\d\d?\/\d\d?\/\d\d\d\d)')
+    matchDatum = reDatum.search(textFromPageZadnja)
+    if matchDatum:
+        datum = matchDatum.group('datum')
 
 #----------BIPAP---------
 elif "BiPAP" in aparat and "SV" not in aparat:
@@ -89,43 +133,29 @@ elif "BiPAP" in aparat and "SV" not in aparat:
 elif "SV" in aparat:
     kategorija = "asv"
 
-"""
-#ostalo - ure, nastavitve, ahi, leak...
-reObjOstalo = re.compile(r'''(
-
-
-    Percent\sof\sDays\swith\sUsage\s>=\s4\sHours(\d*\.\d*)%Percent # percent of days with usage min. 4 h
-    .*
-    Device\sSettings\sas\sof[\d\/]*([\w\s\/\-]*)Device\sSettingsDevice         # device mode
-
-)''', re.VERBOSE)
-matchObjOstalo = reObjOstalo.search(textFromPageZadnja)
-daysWithDeviceUsage = matchObjOstalo.group(2)
-percentDaysWithDeviceUsage = matchObjOstalo.group(3)
-cumulativeUsage = matchObjOstalo.group(4)
-averageUsageAllDays = matchObjOstalo.group(5)
-averageUsageDaysUsed = matchObjOstalo.group(6)
-percentDaysWithUsageAtLeastFourHours = matchObjOstalo.group(7)
-deviceMode = matchObjOstalo.group(8)
-"""
 
 print("priimek: ", priimek) #priimek
 print("ime: ", ime) #ime
 print("aparat: ", aparat) #aparat
 print("idPacienta: ", idPacienta)
-
 print("days with device usage: ", daysWithDeviceUsage)
 print("percent days with device usage: ", percentDaysWithDeviceUsage)
 print("cumulative usage: ", cumulativeUsage)
 print("average usage (all days): ", averageUsageAllDays)
 print("average usage (days used): ", averageUsageDaysUsed)
 print("percent of days with usage >= 4 h: ", percentDaysWithUsageAtLeastFourHours)
-"""
 print("device mode: ", deviceMode)
+print("cpap mean pressure: ", cpapMeanPressure)
+print("avg. time in large leak per day: ", largeLeak)
+print("avg. AHI: ", ahi)
+print("min CPAP pressure: ", minCpapPressure)
+print("max CPAP pressure: ", maxCpapPressure)
+print("a-flex: ", aFlex)
+print("datum: ", datum)
 
-"""
 #print(textFromPage1)
 #print(textFromPageZadnja)
-
+"""
 # todo:
-# kategorija naj se doloci iz
+# kategorija naj se doloci iz device moda
+"""
