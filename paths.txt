@@ -1,0 +1,5 @@
+#input path (pdf report files):
+/home/moh/.virtualenvs/pdf/playground/input/
+
+#output path (txt outputs):
+/home/moh/.virtualenvs/pdf/playground/output/
