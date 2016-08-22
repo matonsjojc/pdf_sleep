@@ -1,2 +1,28 @@
-priimek: Meglic
-ime: Marija
+Vzrok pregleda: ambulantna kontrola CPAP terapije. 
+Uvedba terapije: 
+Veljavnost naročilnice: 
+Dobavitelj: 
+
+Tip aparata: REMstar Auto (System One 60 Series).
+Nastavitev:  AutoCPAP - A-Flex,
+             5 - 7 cm vode, 
+             A-Flex: 3.
+
+Tip maske, ustreznost: 
+
+Podatki o rabi in učinkovitosti: 
+    - skupno število ur: 28 days 16 hrs. 32 mins. 38 secs.
+    - odstotek dni, ko aparat uporablja: 100.0%.
+    - odstotek dni, ko aparat uporablja več kot 4 h/noč: 81.3%.
+    - povprečna uporaba (vsi dnevi): 5 hrs. 22 mins. 45 secs.
+    - povprečna uporaba (dnevi, ko aparat uporablja): 5 hrs. 22 mins. 45 secs.
+
+    - preveliko uhajanje zraka: 6 secs./noč.
+    - prekinitve dihanja v eni uri: AHI = 1.5/h.
+
+Težave: 
+
+Mnenje: 
+
+Predvidena kontrola: 
+Ambulantna kontrola, čez dve leti v Laboratoriju za motnje dihanja v spanju. Tri mesece prej nas pokličite, da se dogovorimo za termin. Dosegljivi smo od ponedeljka do petka med 9.00 in 11.00 na telefonski številki 04 2569 234. V primeru vprašanj ali težav nas pokličite predčasno.

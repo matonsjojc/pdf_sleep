@@ -165,10 +165,31 @@ for report in reports:
     """
 
     #report output:
-    output = "priimek: " + priimek + "\n" + \
-    "ime: " + ime + "\n"
+    output = "Vzrok pregleda: ambulantna kontrola " + kategorija + " terapije. \n" + \
+    "Uvedba terapije: \n" + \
+    "Veljavnost naročilnice: \n" + \
+    "Dobavitelj: \n\n" + \
+    "Tip aparata: " + aparat + ".\n" + \
+    "Nastavitev:  " + deviceMode + ",\n " + \
+    "            "+ minCpapPressure + " - " + maxCpapPressure + " cm vode, \n" + \
+    "             A-Flex: " + aFlex + ".\n\n" + \
+    "Tip maske, ustreznost: \n\n" + \
+    "Podatki o rabi in učinkovitosti: \n" + \
+    "    - skupno število ur: " + cumulativeUsage + "\n" + \
+    "    - odstotek dni, ko aparat uporablja: " + percentDaysWithDeviceUsage + "%." + "\n" + \
+    "    - odstotek dni, ko aparat uporablja več kot 4 h/noč: " + percentDaysWithUsageAtLeastFourHours + "%.\n" + \
+    "    - povprečna uporaba (vsi dnevi): " + averageUsageAllDays + "\n" + \
+    "    - povprečna uporaba (dnevi, ko aparat uporablja): " + averageUsageDaysUsed + "\n\n" + \
+    "    - preveliko uhajanje zraka: " + largeLeak + "/noč.\n" + \
+    "    - prekinitve dihanja v eni uri: AHI = " + ahi + "/h.\n\n" + \
+    "Težave: \n\n" + \
+    "Mnenje: \n\n" + \
+    "Predvidena kontrola: \n" + \
+    "Ambulantna kontrola, čez dve leti v Laboratoriju za motnje dihanja v spanju. " + \
+    "Tri mesece prej nas pokličite, da se dogovorimo za termin. " + \
+    "Dosegljivi smo od ponedeljka do petka med 9.00 in 11.00 na telefonski številki 04 2569 234. " + \
+    "V primeru vprašanj ali težav nas pokličite predčasno."
     print(output)
-
     #write output into a new file:
     outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
     print(outputFileName)
@@ -176,29 +197,12 @@ for report in reports:
     outputFile = open(outputFileName, 'w')
     outputFile.write(output)
     outputFile.close()
-    """
-    ime = "ni podatka"
-    aparat = "ni podatka"
-    idPacienta = "ni podatka"
-    kategorija = "ni podatka" #cpap/bipap/asv...
-    percentDaysWithDeviceUsage = "ni podatka"
-    cumulativeUsage = "ni podatka"
-    averageUsageAllDays = "ni podatka"
-    averageUsageDaysUsed = "ni podatka"
-    percentDaysWithUsageAtLeastFourHours = "ni podatka"
-    deviceMode = "ni podatka"
-    cpapMeanPressure = "ni podatka"
-    largeLeak = "ni podatka"
-    ahi = "ni podatka" #AHI
-    minCpapPressure = "ni podatka"
-    maxCpapPressure = "ni podatka"
-    aFlex = "ni podatka"
-    datum = "ni podatka")
-    """
 
-    #print(textFromPage1)
-    #print(textFromPageZadnja)
     """
     # todo:
-    # kategorija naj se doloci iz device moda
+    # - kategorija naj se doloci iz device moda
+    # - asv, bipap kategorija
+    # - casovni interval zajema podatkov
+    # - spremeni dneve v ure
+
     """
