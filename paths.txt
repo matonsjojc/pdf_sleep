@@ -1,5 +1,5 @@
 #input path (pdf report files):
-/home/moh/.virtualenvs/pdf/playground/input/
+/media/moh/429C56C49C56B261/program_wd/input/
 
 #output path (txt outputs):
-/home/moh/.virtualenvs/pdf/playground/output/
+/media/moh/429C56C49C56B261/program_wd/output/

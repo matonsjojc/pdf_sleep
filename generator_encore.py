@@ -1,6 +1,5 @@
 import PyPDF2, re, os
 
-#paths = open('paths_encore_siht.txt', 'r')
 paths = open('paths.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
@@ -26,10 +25,7 @@ for report in reports:
     textFromPagePredzadnja = pageObjPredzadnja.extractText()
     textFromPageZadnja = pageObjZadnja.extractText()
 
-    print(textFromPage1)
-
-    #zacetne vrednosti spremenljivk so "ni podatka", output = False:
-    output = False
+    #zacetne vrednosti spremenljivk so "ni podatka":
     #auto cpap spremenljivke:
     priimek = "ni podatka"
     ime = "ni podatka"
@@ -55,8 +51,9 @@ for report in reports:
     epapSetting = "ni podatka"
     backupRate = "ni podatka"
 
+
     #Priimek, ime, model aparata
-    reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[−\w]*),\s(?P<ime>[−\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
+    reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[\w]*),\s(?P<ime>[\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
     matchObjPriimekImeAparat = reObjPriimekImeAparat.search(textFromPage1)
     if matchObjPriimekImeAparat:
         priimek = matchObjPriimekImeAparat.group('priimek')
@@ -66,7 +63,7 @@ for report in reports:
         print('no matches')
 
     # ---------CPAP--------
-    if "REMstar" or "DreamStation" in aparat:
+    if "REMstar" in aparat:
         kategorija = "CPAP"
         #id pacienta
         reObjID = re.compile(r'Patient ID: (?P<idPacienta>\d*)')
@@ -109,7 +106,7 @@ for report in reports:
         if matchDeviceMode:
             deviceMode = matchDeviceMode.group('deviceMode')
         #cpap mean pressure
-        reMeanPressure = re.compile(r'CPAP Mean Pressure(?P<cpapMeanPressure>\d+[\.|\,]\d+) cmH2O')
+        reMeanPressure = re.compile(r'CPAP Mean Pressure(?P<cpapMeanPressure>\d+\.\d+) cmH2O')
         matchMeanPressure = reMeanPressure.search(textFromPageZadnja)
         if matchMeanPressure:
             cpapMeanPressure = matchMeanPressure.group('cpapMeanPressure')
@@ -160,7 +157,6 @@ for report in reports:
         "    - odstotek dni, ko aparat uporablja več kot 4 h/noč: " + percentDaysWithUsageAtLeastFourHours + "%.\n" + \
         "    - povprečna uporaba (vsi dnevi): " + averageUsageAllDays + "\n" + \
         "    - povprečna uporaba (dnevi, ko aparat uporablja): " + averageUsageDaysUsed + "\n\n" + \
-        "    - povprečni tlak: " + cpapMeanPressure + " cm vode.\n" + \
         "    - preveliko uhajanje zraka: " + largeLeak + "/noč.\n" + \
         "    - prekinitve dihanja v eni uri: AHI = " + ahi + "/h.\n\n" + \
         "Težave: \n\n" + \
@@ -295,7 +291,7 @@ for report in reports:
     elif "SV" in aparat:
         kategorija = "asv"
 
-    #print(textFromPageZadnja)
+    print(textFromPageZadnja)
 
     """
     print("priimek: ", priimek) #priimek
@@ -323,16 +319,13 @@ for report in reports:
     print("backup rate: ", backupRate)
     """
     #print(output)
-    #if output exists, write output into a new file:
-    if output:
-        outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
-        print(outputFileName)
-        os.chdir(outPath)
-        outputFile = open(outputFileName, 'w')
-        outputFile.write(output)
-        outputFile.close()
-    else:
-        print("nekisjeban")
+    #write output into a new file:
+    outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
+    print(outputFileName)
+    os.chdir(outPath)
+    outputFile = open(outputFileName, 'w')
+    outputFile.write(output)
+    outputFile.close()
 
     """
     # todo:
