@@ -228,9 +228,6 @@ for report in reports:
         if matchBackupRate:
             backupRate = matchBackupRate.group('backupRate')
 
-
-
-
         #average time in large leak per day:
         reLargeLeak = re.compile(r'Average Time in Large Leak Per Day(?P<largeLeak>[\d* hrs\.| mins\.| secs.]*)')
         matchLargeLeak = reLargeLeak.search(textFromPageZadnja)
