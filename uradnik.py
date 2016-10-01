@@ -337,4 +337,5 @@ for report in reports:
     # - kategorija naj se doloci iz device moda - al pa, ce ne...
     # - asv, bipap kategorija
     # - spimpaj ure
+    " - close paths.txt?"
     """
