@@ -1,5 +1,0 @@
-#input path (pdf report files):
-/media/moh/429C56C49C56B261/program_wd/input/
-
-#output path (txt outputs):
-/media/moh/429C56C49C56B261/program_wd/output/

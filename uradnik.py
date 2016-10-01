@@ -1,7 +1,7 @@
 import PyPDF2, re, os
 
 #paths = open('paths_encore_siht.txt', 'r')
-paths = open('paths.txt', 'r')
+paths = open('paths_encore.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
 outPath = pathInPathOut[4][:-1] #outputs are
@@ -150,11 +150,11 @@ for report in reports:
         "Uvedba terapije: \n" + \
         "Veljavnost naročilnice: \n" + \
         "Dobavitelj: \n\n" + \
-        "Tip aparata: " + aparat + ".\n" + \
+        "Aparat: " + aparat + ".\n" + \
+        "Maska: \n" + \
         "Nastavitev:  " + deviceMode + ",\n " + \
         "            "+ minCpapPressure + " - " + maxCpapPressure + " cm vode, \n" + \
         "             A-Flex: " + aFlex + ".\n\n" + \
-        "Tip maske: \n\n" + \
         "Podatki o rabi in učinkovitosti v zadnjih " + timeRange + " dneh:\n" + \
         "    - odstotek dni, ko aparat uporablja: " + percentDaysWithDeviceUsage + "%." + "\n" + \
         "    - odstotek dni, ko aparat uporablja več kot 4 h/noč: " + percentDaysWithUsageAtLeastFourHours + "%.\n" + \
@@ -333,6 +333,7 @@ for report in reports:
 
     """
     # todo:
+    # - popravi, ce ima clovek 2 imeni - friderik miroslav perse npr. je problematicen
     # - kategorija naj se doloci iz device moda - al pa, ce ne...
     # - asv, bipap kategorija
     # - spimpaj ure
