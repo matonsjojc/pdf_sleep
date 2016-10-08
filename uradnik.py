@@ -1,7 +1,7 @@
 import PyPDF2, re, os
 
 #paths = open('paths_encore_siht.txt', 'r')
-paths = open('paths_encore.txt', 'r')
+paths = open('paths_encore_wd.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
 outPath = pathInPathOut[4][:-1] #outputs are
