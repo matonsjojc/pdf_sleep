@@ -1,7 +1,7 @@
 import PyPDF2, re, os
 
-#paths = open('paths_encore_siht.txt', 'r')
-paths = open('paths_encore_wd.txt', 'r')
+paths = open('paths.txt', 'r')
+#paths = open('paths_encore_wd.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
 outPath = pathInPathOut[4][:-1] #outputs are
@@ -26,10 +26,10 @@ for report in reports:
     textFromPagePredzadnja = pageObjPredzadnja.extractText()
     textFromPageZadnja = pageObjZadnja.extractText()
 
-    print(textFromPage1)
+    #print(textFromPage1)
 
     #zacetne vrednosti spremenljivk so "ni podatka", output = False:
-    output = False
+    output = False #string izvida
     #auto cpap spremenljivke:
     priimek = "ni podatka"
     ime = "ni podatka"
@@ -66,7 +66,9 @@ for report in reports:
         print('no matches')
 
     # ---------CPAP--------
-    if "REMstar" or "DreamStation" in aparat:
+
+    if "REMstar" in aparat:
+        print("REMstar ali DreamStation sta v aparatu")
         kategorija = "CPAP"
         #id pacienta
         reObjID = re.compile(r'Patient ID: (?P<idPacienta>\d*)')
@@ -170,12 +172,10 @@ for report in reports:
         "Tri mesece prej nas pokličite, da se dogovorimo za termin. " + \
         "Dosegljivi smo od ponedeljka do petka med 9.00 in 11.00 na telefonski številki 04 2569 234. " + \
         "V primeru vprašanj ali težav nas pokličite predčasno."
-
     #----------BIPAP---------
-    elif "BiPAP" in aparat and "SV" not in aparat:
-        kategorija = "bipap"
+    elif "BiPAP" in aparat:
+        kategorija = "BiPAP"
         #---to do: nastavitev; leak; ahi
-
         #id pacienta
         reObjID = re.compile(r'Patient ID: (?P<idPacienta>\d*)')
         matchObjID = reObjID.search(textFromPageZadnja)
@@ -227,7 +227,6 @@ for report in reports:
         matchBackupRate = reBackupRate.search(textFromPageZadnja)
         if matchBackupRate:
             backupRate = matchBackupRate.group('backupRate')
-
         #average time in large leak per day:
         reLargeLeak = re.compile(r'Average Time in Large Leak Per Day(?P<largeLeak>[\d* hrs\.| mins\.| secs.]*)')
         matchLargeLeak = reLargeLeak.search(textFromPageZadnja)
@@ -286,18 +285,19 @@ for report in reports:
         "Dosegljivi smo od ponedeljka do petka med 9.00 in 11.00 na telefonski številki 04 2569 234. " + \
         "V primeru vprašanj ali težav nas pokličite predčasno."
 
-
-
     #----------ASV-----------
     elif "SV" in aparat:
         kategorija = "asv"
+    else:
+        print("ne najdem kategorije.")
 
     #print(textFromPageZadnja)
 
-    """
+    print("kategorija: ", kategorija)
     print("priimek: ", priimek) #priimek
     print("ime: ", ime) #ime
     print("aparat: ", aparat) #aparat
+    """
     print("idPacienta: ", idPacienta)
     print("days with device usage: ", daysWithDeviceUsage)
     print("percent days with device usage: ", percentDaysWithDeviceUsage)
@@ -319,21 +319,22 @@ for report in reports:
     print("epap setting: ", epapSetting)
     print("backup rate: ", backupRate)
     """
-    #print(output)
+    print(output)
+
     #if output exists, write output into a new file:
     if output:
         outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
-        print(outputFileName)
+        #print(outputFileName)
         os.chdir(outPath)
         outputFile = open(outputFileName, 'w')
         outputFile.write(output)
         outputFile.close()
     else:
-        print("nekisjeban")
+        print("bo ja. bo kurac.")
 
     """
     # todo:
-    # - popravi, ce ima clovek 2 imeni - friderik miroslav perse npr. je problematicen
+    # - popravi, ce ima clovek 2 imeni je problematicen
     # - kategorija naj se doloci iz device moda - al pa, ce ne...
     # - asv, bipap kategorija
     # - spimpaj ure

@@ -1,6 +1,7 @@
 import PyPDF2, re, os
 
-paths = open('paths.txt', 'r')
+paths = open('paths_philips_siht.txt', 'r') #shranjuje na kljucek
+#paths = open('paths_encore_wd.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
 outPath = pathInPathOut[4][:-1] #outputs are
@@ -25,7 +26,10 @@ for report in reports:
     textFromPagePredzadnja = pageObjPredzadnja.extractText()
     textFromPageZadnja = pageObjZadnja.extractText()
 
-    #zacetne vrednosti spremenljivk so "ni podatka":
+    print(textFromPage1)
+
+    #zacetne vrednosti spremenljivk so "ni podatka", output = False:
+    output = False
     #auto cpap spremenljivke:
     priimek = "ni podatka"
     ime = "ni podatka"
@@ -51,9 +55,8 @@ for report in reports:
     epapSetting = "ni podatka"
     backupRate = "ni podatka"
 
-
     #Priimek, ime, model aparata
-    reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[\w]*),\s(?P<ime>[\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
+    reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[−\w]*),\s(?P<ime>[−\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
     matchObjPriimekImeAparat = reObjPriimekImeAparat.search(textFromPage1)
     if matchObjPriimekImeAparat:
         priimek = matchObjPriimekImeAparat.group('priimek')
@@ -63,7 +66,7 @@ for report in reports:
         print('no matches')
 
     # ---------CPAP--------
-    if "REMstar" in aparat:
+    if "REMstar" or "DreamStation" in aparat:
         kategorija = "CPAP"
         #id pacienta
         reObjID = re.compile(r'Patient ID: (?P<idPacienta>\d*)')
@@ -106,7 +109,7 @@ for report in reports:
         if matchDeviceMode:
             deviceMode = matchDeviceMode.group('deviceMode')
         #cpap mean pressure
-        reMeanPressure = re.compile(r'CPAP Mean Pressure(?P<cpapMeanPressure>\d+\.\d+) cmH2O')
+        reMeanPressure = re.compile(r'CPAP Mean Pressure(?P<cpapMeanPressure>\d+[\.|\,]\d+) cmH2O')
         matchMeanPressure = reMeanPressure.search(textFromPageZadnja)
         if matchMeanPressure:
             cpapMeanPressure = matchMeanPressure.group('cpapMeanPressure')
@@ -147,16 +150,17 @@ for report in reports:
         "Uvedba terapije: \n" + \
         "Veljavnost naročilnice: \n" + \
         "Dobavitelj: \n\n" + \
-        "Tip aparata: " + aparat + ".\n" + \
+        "Aparat: " + aparat + ".\n" + \
+        "Maska: \n" + \
         "Nastavitev:  " + deviceMode + ",\n " + \
         "            "+ minCpapPressure + " - " + maxCpapPressure + " cm vode, \n" + \
         "             A-Flex: " + aFlex + ".\n\n" + \
-        "Tip maske: \n\n" + \
         "Podatki o rabi in učinkovitosti v zadnjih " + timeRange + " dneh:\n" + \
         "    - odstotek dni, ko aparat uporablja: " + percentDaysWithDeviceUsage + "%." + "\n" + \
         "    - odstotek dni, ko aparat uporablja več kot 4 h/noč: " + percentDaysWithUsageAtLeastFourHours + "%.\n" + \
         "    - povprečna uporaba (vsi dnevi): " + averageUsageAllDays + "\n" + \
         "    - povprečna uporaba (dnevi, ko aparat uporablja): " + averageUsageDaysUsed + "\n\n" + \
+        "    - povprečni tlak: " + cpapMeanPressure + " cm vode.\n" + \
         "    - preveliko uhajanje zraka: " + largeLeak + "/noč.\n" + \
         "    - prekinitve dihanja v eni uri: AHI = " + ahi + "/h.\n\n" + \
         "Težave: \n\n" + \
@@ -224,9 +228,6 @@ for report in reports:
         if matchBackupRate:
             backupRate = matchBackupRate.group('backupRate')
 
-
-
-
         #average time in large leak per day:
         reLargeLeak = re.compile(r'Average Time in Large Leak Per Day(?P<largeLeak>[\d* hrs\.| mins\.| secs.]*)')
         matchLargeLeak = reLargeLeak.search(textFromPageZadnja)
@@ -291,7 +292,7 @@ for report in reports:
     elif "SV" in aparat:
         kategorija = "asv"
 
-    print(textFromPageZadnja)
+    #print(textFromPageZadnja)
 
     """
     print("priimek: ", priimek) #priimek
@@ -319,17 +320,22 @@ for report in reports:
     print("backup rate: ", backupRate)
     """
     #print(output)
-    #write output into a new file:
-    outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
-    print(outputFileName)
-    os.chdir(outPath)
-    outputFile = open(outputFileName, 'w')
-    outputFile.write(output)
-    outputFile.close()
+    #if output exists, write output into a new file:
+    if output:
+        outputFileName = priimek + "_" + ime + "_" + idPacienta + ".txt"
+        print(outputFileName)
+        os.chdir(outPath)
+        outputFile = open(outputFileName, 'w')
+        outputFile.write(output)
+        outputFile.close()
+    else:
+        print("nekisjeban")
 
     """
     # todo:
+    # - popravi, ce ima clovek 2 imeni - friderik miroslav perse npr. je problematicen
     # - kategorija naj se doloci iz device moda - al pa, ce ne...
     # - asv, bipap kategorija
     # - spimpaj ure
+    " - close paths.txt?"
     """
