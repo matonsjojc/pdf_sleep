@@ -4,10 +4,25 @@ paths = open('paths.txt', 'r')
 #paths = open('paths_encore_wd.txt', 'r')
 pathInPathOut = paths.readlines()
 inPath = pathInPathOut[1][:-1] #pdfs are here
-outPath = pathInPathOut[4][:-1] #outputs are
+outPath = pathInPathOut[4][:-1] #outputs are here
 
 os.chdir(inPath)
 reports = os.listdir(inPath)
+
+def find_useful_pages(pdfReader):
+    #dobi pdfReader object, vsako stran pretvori v string; vrne uporabne strani (za bipap, asv)
+    bipap_leak_ahi_page = False
+    for page_num in range(pdfReader.getNumPages()):
+        page = pdfReader.getPage(page_num)
+        page_text = page.extractText()
+        print("STRAN: ", page_num)
+        #pri kategoriji BiPAP
+        if "Long Term Trend" in page_text and "Average Leak" in page_text and "Average AHI" in page_text:
+            if not bipap_leak_ahi_page:
+                bipap_leak_ahi_page = page_text
+                print(bipap_leak_ahi_page)
+    return bipap_leak_ahi_page
+
 
 for report in reports:
     os.chdir(inPath)
@@ -26,7 +41,6 @@ for report in reports:
     textFromPagePredzadnja = pageObjPredzadnja.extractText()
     textFromPageZadnja = pageObjZadnja.extractText()
 
-    #print(textFromPage1)
 
     #zacetne vrednosti spremenljivk so "ni podatka", output = False:
     output = False #string izvida
@@ -51,9 +65,11 @@ for report in reports:
     datum = "ni podatka"
     timeRange = "ni podatka"
     #bipap vars:
+
     ipapSetting = "ni podatka"
     epapSetting = "ni podatka"
     backupRate = "ni podatka"
+    averageLeak = "ni podatka"
 
     #Priimek, ime, model aparata
     reObjPriimekImeAparat = re.compile(r'Information(?P<priimek>[−\w]*),\s(?P<ime>[−\w]*)Device: (?P<aparat>[\w\s\d\/]*\([\w\s]*\))')
@@ -66,7 +82,6 @@ for report in reports:
         print('no matches')
 
     # ---------CPAP--------
-
     if "REMstar" in aparat:
         print("REMstar ali DreamStation sta v aparatu")
         kategorija = "CPAP"
@@ -175,7 +190,8 @@ for report in reports:
     #----------BIPAP---------
     elif "BiPAP" in aparat:
         kategorija = "BiPAP"
-        #---to do: nastavitev; leak; ahi
+        #poisci strani za leak in ahi:
+        bipap_leak_ahi_page = find_useful_pages(pdfReader)
         #id pacienta
         reObjID = re.compile(r'Patient ID: (?P<idPacienta>\d*)')
         matchObjID = reObjID.search(textFromPageZadnja)
@@ -227,14 +243,14 @@ for report in reports:
         matchBackupRate = reBackupRate.search(textFromPageZadnja)
         if matchBackupRate:
             backupRate = matchBackupRate.group('backupRate')
-        #average time in large leak per day:
-        reLargeLeak = re.compile(r'Average Time in Large Leak Per Day(?P<largeLeak>[\d* hrs\.| mins\.| secs.]*)')
-        matchLargeLeak = reLargeLeak.search(textFromPageZadnja)
-        if matchLargeLeak:
-            largeLeak = matchLargeLeak.group('largeLeak')
+        #average leak:
+        reAverageLeak = re.compile(r'Average Leak(?P<averageLeak>\d+[\.|\,]\d)')
+        matchAverageLeak = reAverageLeak.search(bipap_leak_ahi_page)
+        if matchAverageLeak:
+            averageLeak = matchAverageLeak.group('averageLeak')
         #average AHI
-        reAhi = re.compile(r'Average AHI(?P<ahi>\d+\.\d+)')
-        matchAhi = reAhi.search(textFromPageZadnja)
+        reAhi = re.compile(r'Average AHI(?P<ahi>\d+[\.|\,]\d)')
+        matchAhi = reAhi.search(bipap_leak_ahi_page)
         if matchAhi:
             ahi = matchAhi.group('ahi')
         #min in max tlak
@@ -275,7 +291,7 @@ for report in reports:
         "    - odstotek dni, ko aparat uporablja več kot 4 h/noč: " + percentDaysWithUsageAtLeastFourHours + "%.\n" + \
         "    - povprečna uporaba (vsi dnevi): " + averageUsageAllDays + "\n" + \
         "    - povprečna uporaba (dnevi, ko aparat uporablja): " + averageUsageDaysUsed + "\n\n" + \
-        "    - preveliko uhajanje zraka: " + largeLeak + "/noč.\n" + \
+        "    - povprečno izhajanje zraka: " + averageLeak + " l/min.\n" + \
         "    - prekinitve dihanja v eni uri: AHI = " + ahi + "/h.\n\n" + \
         "Težave: \n\n" + \
         "Zaključek: \n\n" + \
@@ -290,7 +306,6 @@ for report in reports:
         kategorija = "asv"
     else:
         print("ne najdem kategorije.")
-
     #print(textFromPageZadnja)
 
     print("kategorija: ", kategorija)
@@ -319,7 +334,7 @@ for report in reports:
     print("epap setting: ", epapSetting)
     print("backup rate: ", backupRate)
     """
-    print(output)
+    #print(output)
 
     #if output exists, write output into a new file:
     if output:
@@ -335,8 +350,10 @@ for report in reports:
     """
     # todo:
     # - popravi, ce ima clovek 2 imeni je problematicen
+    # - popravi imena s sumniki
     # - kategorija naj se doloci iz device moda - al pa, ce ne...
-    # - asv, bipap kategorija
+    # - asv kategorija
     # - spimpaj ure
+    # - oznaci izstopajoce vrednosti s !
     " - close paths.txt?"
     """
